@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class TransactionIngestor {
@@ -24,53 +25,35 @@ public class TransactionIngestor {
                     .skip(1)
                     .limit(1000)
                     .map(this::getTransaction)
+//                    .filter(t -> t != null)  //Objects::nonNull -> não funciona com Optional
+                    .filter(t -> t.isPresent()) //Optional.isPresent() -> method reference
+                    .map(t -> t.get())
                     .toList();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erro ao ler arquivo: " + fileName, e);
         }
-
-//        try (FileInputStream fis = new FileInputStream(fileName);
-//             Scanner scanner = new Scanner(fis)) {
-//
-//            int line = 0;
-//
-//            while(scanner.hasNextLine()) {
-//                String lineContent = scanner.nextLine();
-//                line++;
-//
-//                if(line == 1) {
-//                    continue;
-//                }
-//
-//                if(line > 1001) {
-//                    break;
-//                }
-//
-//
-//
-//                Transaction transaction = getTransaction(lineContent);
-//                transactions.add(transaction);
-//
-//            }
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-
-//        return transactions;
-
     }
 
-    private Transaction getTransaction(String line) {
-        String[] lineArray = line.split(",");
-        int step =  Integer.parseInt(lineArray[0]);
-        TransactionType type =  TransactionType.valueOf(lineArray[1]);
-        BigDecimal amount = new BigDecimal(lineArray[2]);
-        TransactionCustomer origin = new TransactionCustomer(lineArray[3], new BigDecimal(lineArray[4]), new BigDecimal(lineArray[5]));
-        TransactionCustomer recipient =  new TransactionCustomer(lineArray[3], new BigDecimal(lineArray[4]), new BigDecimal(lineArray[5]));
-        boolean isFraud = Boolean.parseBoolean(lineArray[6]);
-        boolean isFlaggedFraud =  Boolean.parseBoolean(lineArray[7]);
+    private Optional<Transaction> getTransaction(String line) {
 
-        return new Transaction(step, type, amount, origin, recipient, isFraud, isFlaggedFraud);
+        try {
+            String[] lineArray = line.split(",");
+            int step = Integer.parseInt(lineArray[0]);
+            TransactionType type = TransactionType.valueOf(lineArray[1]);
+
+            if(lineArray[2].equals("null") || lineArray[2].trim().isEmpty()) {
+                throw new IllegalArgumentException("Amount não pode ser nulo ou vazio");
+            }
+            BigDecimal amount = new BigDecimal(lineArray[2]);
+            TransactionCustomer origin = new TransactionCustomer(lineArray[3], new BigDecimal(lineArray[4]), new BigDecimal(lineArray[5]));
+            TransactionCustomer recipient = new TransactionCustomer(lineArray[6], new BigDecimal(lineArray[7]), new BigDecimal(lineArray[8]));
+            boolean isFraud = Boolean.parseBoolean(lineArray[9]);
+            boolean isFlaggedFraud = Boolean.parseBoolean(lineArray[10]);
+
+            return Optional.of(new Transaction(step, type, amount, origin, recipient, isFraud, isFlaggedFraud));
+        } catch (Exception e) {
+            System.err.println("Erro a ler linha: " + line + " | " + e);
+            return Optional.empty();
+        }
     }
 }

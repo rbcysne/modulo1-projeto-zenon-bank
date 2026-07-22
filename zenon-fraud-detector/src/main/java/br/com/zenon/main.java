@@ -20,13 +20,19 @@ public class main {
 //        IO.println(t2);
 
 
-        String fileName = "/Users/rommelcysne/IdeaProjects/unipds/modulo1-projeto-zenon-bank/data/PS_20174392719_1491204439457_log.csv";
+//        String fileName = "/Users/rommelcysne/IdeaProjects/unipds/modulo1-projeto-zenon-bank/data/PS_20174392719_1491204439457_log.csv";
 
         TransactionIngestor ingestor = new TransactionIngestor();
-        List<Transaction> transactions = ingestor.readFile(fileName);
+//        List<Transaction> transactions = ingestor.readFile(fileName);
 
-        IO.println(transactions.size());
-        transactions.stream().limit(10).forEach(IO::println);
+//        IO.println(transactions.size());
+//        transactions.stream().limit(10).forEach(IO::println);
 
+        String fileNameBadData = "/Users/rommelcysne/IdeaProjects/unipds/modulo1-projeto-zenon-bank/data/paysim_with_bad_data.csv";
+
+        IO.println("---------------- Transactions with bad data: -------------------");
+        List<Transaction> transactionsBadData = ingestor.readFile(fileNameBadData);
+        IO.println("total geral: " + transactionsBadData.size());
+        transactionsBadData.forEach(IO::println);
     }
 }
