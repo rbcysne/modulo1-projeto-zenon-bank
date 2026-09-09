@@ -14,6 +14,8 @@ import java.util.Scanner;
 
 public class TransactionIngestor {
 
+    public static final int LINES_LIMIT = 50_000;
+
     public List<Transaction> readFile(String fileName) {
 
         List<Transaction> transactions = new ArrayList<>();
@@ -23,7 +25,7 @@ public class TransactionIngestor {
             List<String> lines = Files.readAllLines(path);
             return lines.stream()
                     .skip(1)
-                    .limit(1000)
+                    .limit(LINES_LIMIT)
                     .map(this::getTransaction)
 //                    .filter(t -> t != null)  //Objects::nonNull -> não funciona com Optional
                     .filter(t -> t.isPresent()) //Optional.isPresent() -> method reference
@@ -47,8 +49,8 @@ public class TransactionIngestor {
             BigDecimal amount = new BigDecimal(lineArray[2]);
             TransactionCustomer origin = new TransactionCustomer(lineArray[3], new BigDecimal(lineArray[4]), new BigDecimal(lineArray[5]));
             TransactionCustomer recipient = new TransactionCustomer(lineArray[6], new BigDecimal(lineArray[7]), new BigDecimal(lineArray[8]));
-            boolean isFraud = Boolean.parseBoolean(lineArray[9]);
-            boolean isFlaggedFraud = Boolean.parseBoolean(lineArray[10]);
+            boolean isFraud = "1".equals(lineArray[9]);
+            boolean isFlaggedFraud = "1".equals(lineArray[10]);
 
             return Optional.of(new Transaction(step, type, amount, origin, recipient, isFraud, isFlaggedFraud));
         } catch (Exception e) {
