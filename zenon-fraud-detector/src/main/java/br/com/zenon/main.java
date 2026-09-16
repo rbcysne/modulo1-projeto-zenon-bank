@@ -46,6 +46,8 @@ public class main {
         long frauds = fraudAnalyzer.countFrauds();
         IO.println("Total de fraudes: " + frauds);
 
+        IO.println("---------------- Top 3 Frauds: -------------------");
+
         List<Transaction> highestFrauds = fraudAnalyzer.getHighestFrauds(3);
         IO.println("Top 3 frauds: ");
         highestFrauds
@@ -53,15 +55,47 @@ public class main {
                 .map(Transaction::amount)
                 .forEach(IO::println);
 
+        IO.println("---------------- Top 5 suspicious customers: -------------------");
+
         List<String> mostSuspiciousCustomers = fraudAnalyzer.getSuspiciousCustomers(5);
         IO.println("Top 5 suspicious customers: ");
         mostSuspiciousCustomers.forEach(IO::println);
 
+        IO.println("---------------- Total fraud loss: -------------------");
+
         BigDecimal totalFraudLoss = fraudAnalyzer.calculateTotalFraudLoss();
         IO.println("Total fraud loss: " + totalFraudLoss);
+
+        IO.println("---------------- Fraudes by type: -------------------");
 
         Map<TransactionType, Long> fraudByType = fraudAnalyzer.getTotalFraudsByType();
         IO.println("Fraudes por tipo: ");
         fraudByType.forEach((type, count) -> IO.println(type + ": " + count));
+
+        IO.println("---------------- Benchmark List x Map: -------------------");
+
+        TransactionRepository transactionRepository;
+
+        transactionRepository= new TransactionListRepository(transactions);
+        IO.println("Valor existente em lista:");
+//        long inicio = System.nanoTime();
+//        transactionListRepository.getTransactionByNameOrig("C1231006815").ifPresent(IO::println);
+//        long fim = System.nanoTime();
+//        IO.println("Tempo: " + (fim - inicio) + " nanos");
+
+        String nameOrig = "C1868032458";
+        long inicio = System.nanoTime();
+        transactionRepository.getTransactionByNameOrig(nameOrig).ifPresentOrElse(IO::println, () -> IO.println(("Transaction not found: " + nameOrig)));
+        long fim = System.nanoTime();
+        IO.println("Tempo de busca em lista: " + ((fim - inicio) / 1_000_000.0) + " milissegundos");
+
+        transactionRepository = new TransactionMapRepository(transactions);
+        IO.println("Valor existente em mapa:");
+        inicio = System.nanoTime();
+        transactionRepository.getTransactionByNameOrig(nameOrig).ifPresentOrElse(IO::println, () -> IO.println(("Transaction not found: " + nameOrig)));
+        fim = System.nanoTime();
+        IO.println("Tempo de busca em mapa: " + ((fim - inicio) / 1_000_000.0) + " milissegundos");
+
+
     }
 }

@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 public class TransactionIngestor {
 
-    public static final int LINES_LIMIT = 50_000;
+    public static final int LINES_LIMIT = 100_000;
 
     public List<Transaction> readFile(String fileName) {
 
