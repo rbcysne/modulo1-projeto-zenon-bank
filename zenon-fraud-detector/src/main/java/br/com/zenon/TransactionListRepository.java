@@ -22,4 +22,10 @@ public class TransactionListRepository implements TransactionRepository{
 
         return transact;
     }
+
+    @Override
+    public void save(Transaction transaction) {
+        transactions.add(transaction);
+    }
+
 }
